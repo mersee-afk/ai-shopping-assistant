@@ -1,23 +1,32 @@
 function ChatMessage({ message, sender }) {
+  const isUser = sender === "user";
+
   return (
     <div
       style={{
-        display: "flex",
-        justifyContent: sender === "user" ? "flex-end" : "flex-start",
-        marginBottom: "12px",
+        alignSelf: isUser ? "flex-end" : "flex-start",
+        maxWidth: "75%",
+        background: isUser ? "#2563eb" : "#1f2937",
+        color: "white",
+        padding: "12px 14px",
+        borderRadius: "14px",
+        lineHeight: "1.5",
+        wordBreak: "break-word",
+        border: isUser ? "1px solid #3b82f6" : "1px solid #374151",
       }}
     >
       <div
         style={{
-          background: sender === "user" ? "#2563eb" : "#374151",
-          color: "white",
-          padding: "10px 14px",
-          borderRadius: "12px",
-          maxWidth: "70%",
+          fontSize: "12px",
+          marginBottom: "6px",
+          color: isUser ? "#dbeafe" : "#9ca3af",
+          fontWeight: "bold",
         }}
       >
-        {message}
+        {isUser ? "You" : "Assistant"}
       </div>
+
+      <div>{message}</div>
     </div>
   );
 }

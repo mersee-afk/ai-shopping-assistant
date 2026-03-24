@@ -4,33 +4,28 @@ import ChatMessage from "./ChatMessage";
 function ChatMessages({ chatMessages }) {
   const bottomRef = useRef(null);
 
-  
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatMessages]); // auto scroll when message adds
+  }, [chatMessages]);
 
   return (
     <div
-  style={{
-    flex: 1,
-    overflowY: "auto",
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px",
-    padding: "10px",
-    background: "#111827",
-    borderRadius: "10px",
-  }}
->
+      style={{
+        height: "100%",
+        overflowY: "auto",
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px",
+        padding: "14px",
+        background: "#0b1220",
+        borderRadius: "12px",
+        border: "1px solid #1e293b",
+      }}
+    >
       {chatMessages.map((msg) => (
-        <ChatMessage
-          key={msg.id}
-          message={msg.message}
-          sender={msg.sender}
-        />
+        <ChatMessage key={msg.id} message={msg.message} sender={msg.sender} />
       ))}
 
-      {/* invisible scroll target */}
       <div ref={bottomRef}></div>
     </div>
   );
