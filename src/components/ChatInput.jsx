@@ -44,6 +44,7 @@ function getMatchedProducts(text, allProducts) {
     };
   }
 
+  // greetings
   if (
     normalizedText.includes("hello") ||
     normalizedText.includes("hi") ||
@@ -56,6 +57,7 @@ function getMatchedProducts(text, allProducts) {
     };
   }
 
+  // show all
   if (normalizedText.includes("show all")) {
     return {
       reply: `Showing all available products.`,
@@ -63,6 +65,7 @@ function getMatchedProducts(text, allProducts) {
     };
   }
 
+  // 💰 Budget logic
   const budgetRange = getBudgetRange(normalizedText);
 
   if (budgetRange) {
@@ -98,6 +101,15 @@ function getMatchedProducts(text, allProducts) {
     };
   }
 
+  // 🔥 SMART SEARCH FIX (MAIN CHANGE)
+  const synonyms = {
+    phone: "smartphone",
+    phones: "smartphones",
+    laptop: "laptops",
+  };
+
+  const searchText = synonyms[normalizedText] || normalizedText;
+
   const matchedProducts = allProducts.filter((product) => {
     const title = product.title?.toLowerCase() || "";
     const category = product.category?.toLowerCase() || "";
@@ -105,10 +117,10 @@ function getMatchedProducts(text, allProducts) {
     const description = product.description?.toLowerCase() || "";
 
     return (
-      title.includes(normalizedText) ||
-      category.includes(normalizedText) ||
-      brand.includes(normalizedText) ||
-      description.includes(normalizedText)
+      title.includes(searchText) ||
+      category.includes(searchText) ||
+      brand.includes(searchText) ||
+      description.includes(searchText)
     );
   });
 
