@@ -114,14 +114,11 @@ const searchText = synonyms[normalizedText] || normalizedText;
 const matchedProducts = allProducts.filter((product) => {
   const title = product.title?.toLowerCase() || "";
   const category = product.category?.toLowerCase() || "";
-  const brand = product.brand?.toLowerCase() || "";
-  const description = product.description?.toLowerCase() || "";
+
 
   return (
     title.includes(searchText) ||
-    category.includes(searchText) ||
-    brand.includes(searchText) ||
-    description.includes(searchText)
+    category.includes(searchText)
   );
 });
 

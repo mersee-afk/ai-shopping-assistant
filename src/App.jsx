@@ -25,7 +25,7 @@ function App() {
         setLoading(true);
         setError("");
 
-        const response = await fetch("https://api.allorigins.win/raw?url=https://dummyjson.com/products?limit=50");
+        const response = await fetch("https://fakestoreapi.com/products");
 
         if (!response.ok) {
           throw new Error("Failed to fetch products");
