@@ -10,7 +10,7 @@ function App() {
       id: crypto.randomUUID(),
       sender: "robot",
       message:
-        "Hello! I can help you find laptops, phones, skincare, groceries, or products by brand and budget.",
+        "Hello! I can help you find electronics, men's clothing, women's clothing, or jewelry.",
     },
   ]);
 
@@ -33,8 +33,10 @@ function App() {
 
         const data = await response.json();
 
-        setAllProducts(data.products || []);
+        // ✅ FIXED HERE
+        setAllProducts(data || []);
       } catch (err) {
+        console.log(err);
         setError("Unable to load products. Please try again later.");
       } finally {
         setLoading(false);
@@ -84,7 +86,7 @@ function App() {
             fontSize: "14px",
           }}
         >
-          Chat-based shopping assistant with real API data, filtering, and smart replies
+          Chat-based shopping assistant with real API data and filtering
         </p>
 
         <StatusBar

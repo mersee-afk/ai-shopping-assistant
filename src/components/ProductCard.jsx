@@ -34,11 +34,11 @@ function ProductCard({ product }) {
         </h3>
 
         <p style={{ margin: "0 0 6px 0", color: "#9ca3af", fontSize: "14px" }}>
-          Brand: {product.brand || "N/A"}
+          Category: {product.category}
         </p>
 
         <p style={{ margin: "0 0 6px 0", color: "#9ca3af", fontSize: "14px" }}>
-          Category: {product.category}
+          Rating: {product.rating?.rate || "N/A"}
         </p>
 
         <p style={{ margin: 0, color: "#86efac", fontWeight: "bold" }}>
