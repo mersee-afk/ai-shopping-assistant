@@ -2,10 +2,12 @@ import { useState } from "react";
 
 const USD_TO_INR = 83;
 
+// 💰 Convert USD to INR
 function formatPriceInRupees(priceInUsd) {
   return Math.round(priceInUsd * USD_TO_INR);
 }
 
+// 💰 Budget parser
 function getBudgetRange(text) {
   const betweenMatch = text.match(/between\s+(\d+)\s+and\s+(\d+)/i);
   if (betweenMatch) {
@@ -34,6 +36,7 @@ function getBudgetRange(text) {
   return null;
 }
 
+// 🔍 MAIN SEARCH FUNCTION
 function getMatchedProducts(text, allProducts) {
   const normalizedText = text.toLowerCase().trim();
 
@@ -44,7 +47,7 @@ function getMatchedProducts(text, allProducts) {
     };
   }
 
-  // greetings
+  // 👋 Greeting
   if (
     normalizedText.includes("hello") ||
     normalizedText.includes("hi") ||
@@ -52,26 +55,29 @@ function getMatchedProducts(text, allProducts) {
   ) {
     return {
       reply:
-        "Hello! Try searches like 'laptop', 'phone', 'beauty', 'Apple', 'under 50000', or 'between 20000 and 60000'.",
+        "Hello! Try searches like 'laptop', 'phone', 'electronics', 'men', or 'under 50000'.",
       products: [],
     };
   }
 
-  // show all
+  // 📦 Show all
   if (normalizedText.includes("show all")) {
     return {
-      reply: `Showing all available products.`,
+      reply: "Showing all available products.",
       products: allProducts,
     };
   }
 
-  // 💰 Budget logic
+  // 💰 Budget filtering
   const budgetRange = getBudgetRange(normalizedText);
 
   if (budgetRange) {
     const matchedByBudget = allProducts.filter((product) => {
       const rupeePrice = formatPriceInRupees(product.price);
-      return rupeePrice >= budgetRange.min && rupeePrice <= budgetRange.max;
+      return (
+        rupeePrice >= budgetRange.min &&
+        rupeePrice <= budgetRange.max
+      );
     });
 
     if (matchedByBudget.length === 0) {
@@ -81,46 +87,31 @@ function getMatchedProducts(text, allProducts) {
       };
     }
 
-    if (budgetRange.max === Infinity) {
-      return {
-        reply: `Here are products above ₹${budgetRange.min}.`,
-        products: matchedByBudget,
-      };
-    }
-
-    if (budgetRange.min > 0) {
-      return {
-        reply: `Here are products between ₹${budgetRange.min} and ₹${budgetRange.max}.`,
-        products: matchedByBudget,
-      };
-    }
-
     return {
-      reply: `Here are products under ₹${budgetRange.max}.`,
+      reply: `Found ${matchedByBudget.length} product(s) in your budget.`,
       products: matchedByBudget,
     };
   }
 
-  // 🔥 SMART SEARCH FIX (MAIN CHANGE)
- const synonyms = {
-  phone: "smartphones",
-  phones: "smartphones",
-  mobile: "smartphones",
-  laptop: "laptops",
-};
+  // 🔥 SMART CATEGORY MAPPING (IMPORTANT)
+  const synonyms = {
+    laptop: "electronics",
+    phone: "electronics",
+    mobile: "electronics",
+  };
 
-const searchText = synonyms[normalizedText] || normalizedText;
+  const searchText = synonyms[normalizedText] || normalizedText;
 
-const matchedProducts = allProducts.filter((product) => {
-  const title = product.title?.toLowerCase() || "";
-  const category = product.category?.toLowerCase() || "";
+  // 🔍 FILTER LOGIC
+  const matchedProducts = allProducts.filter((product) => {
+    const title = product.title?.toLowerCase() || "";
+    const category = product.category?.toLowerCase() || "";
 
-
-  return (
-    title.includes(searchText) ||
-    category.includes(searchText)
-  );
-});
+    return (
+      title.includes(searchText) ||
+      category.includes(searchText)
+    );
+  });
 
   if (matchedProducts.length > 0) {
     return {
@@ -131,11 +122,12 @@ const matchedProducts = allProducts.filter((product) => {
 
   return {
     reply:
-      "Sorry, I couldn't find matching products. Try category, brand, product name, or budget like 'under 50000'.",
+      "Sorry, I couldn't find matching products. Try 'electronics', 'men', 'jewelery', or 'under 50000'.",
     products: [],
   };
 }
 
+// 🧩 COMPONENT
 function ChatInput({
   allProducts,
   loading,
@@ -145,15 +137,11 @@ function ChatInput({
 }) {
   const [inputText, setInputText] = useState("");
 
-  function handleChange(event) {
-    setInputText(event.target.value);
-  }
-
   function sendMessage() {
     const trimmedText = inputText.trim();
-
     if (!trimmedText) return;
 
+    // 👤 User message
     const userMessage = {
       id: crypto.randomUUID(),
       sender: "user",
@@ -162,92 +150,79 @@ function ChatInput({
 
     setChatMessages((prev) => [...prev, userMessage]);
 
+    // ⏳ Loading check
     if (loading) {
-      const loadingMessage = {
-        id: crypto.randomUUID(),
-        sender: "robot",
-        message: "Products are still loading. Please wait a moment.",
-      };
-
-      setTimeout(() => {
-        setChatMessages((prev) => [...prev, loadingMessage]);
-      }, 500);
-
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          sender: "robot",
+          message: "Products are loading...",
+        },
+      ]);
       setInputText("");
       return;
     }
 
+    // ❌ Error check
     if (error) {
-      const errorMessage = {
-        id: crypto.randomUUID(),
-        sender: "robot",
-        message: "I cannot search products right now because product loading failed.",
-      };
-
-      setTimeout(() => {
-        setChatMessages((prev) => [...prev, errorMessage]);
-      }, 500);
-
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          sender: "robot",
+          message: "Unable to fetch products right now.",
+        },
+      ]);
       setInputText("");
       return;
     }
 
+    // 🔍 Get results
     const result = getMatchedProducts(trimmedText, allProducts);
 
     setFilteredProducts(result.products);
 
-    const robotMessage = {
-      id: crypto.randomUUID(),
-      sender: "robot",
-      message: result.reply,
-    };
-
+    // 🤖 Bot reply
     setTimeout(() => {
-      setChatMessages((prev) => [...prev, robotMessage]);
-    }, 500);
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          sender: "robot",
+          message: result.reply,
+        },
+      ]);
+    }, 400);
 
     setInputText("");
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "10px",
-        marginTop: "14px",
-        flexWrap: "wrap",
-      }}
-    >
+    <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
       <input
-        placeholder="Try: laptop, phone, Apple, under 50000, between 20000 and 60000"
+        placeholder="Try: laptop, phone, electronics, men, under 50000"
         value={inputText}
-        onChange={handleChange}
+        onChange={(e) => setInputText(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter") sendMessage();
         }}
         style={{
           flex: 1,
-          minWidth: "240px",
-          padding: "14px",
-          background: "#0f172a",
-          border: "1px solid #334155",
-          color: "white",
-          borderRadius: "10px",
-          outline: "none",
-          fontSize: "14px",
+          padding: "12px",
+          borderRadius: "8px",
+          border: "1px solid #ccc",
         }}
       />
 
       <button
         onClick={sendMessage}
         style={{
-          padding: "14px 20px",
+          padding: "12px 18px",
           background: "#22c55e",
-          border: "none",
           color: "white",
-          borderRadius: "10px",
-          cursor: "pointer",
-          fontWeight: "bold",
+          border: "none",
+          borderRadius: "8px",
         }}
       >
         Send
