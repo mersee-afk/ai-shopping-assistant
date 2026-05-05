@@ -102,27 +102,28 @@ function getMatchedProducts(text, allProducts) {
   }
 
   // 🔥 SMART SEARCH FIX (MAIN CHANGE)
-  const synonyms = {
-    phone: "smartphone",
-    phones: "smartphones",
-    laptop: "laptops",
-  };
+ const synonyms = {
+  phone: "smartphones",
+  phones: "smartphones",
+  mobile: "smartphones",
+  laptop: "laptops",
+};
 
-  const searchText = synonyms[normalizedText] || normalizedText;
+const searchText = synonyms[normalizedText] || normalizedText;
 
-  const matchedProducts = allProducts.filter((product) => {
-    const title = product.title?.toLowerCase() || "";
-    const category = product.category?.toLowerCase() || "";
-    const brand = product.brand?.toLowerCase() || "";
-    const description = product.description?.toLowerCase() || "";
+const matchedProducts = allProducts.filter((product) => {
+  const title = product.title?.toLowerCase() || "";
+  const category = product.category?.toLowerCase() || "";
+  const brand = product.brand?.toLowerCase() || "";
+  const description = product.description?.toLowerCase() || "";
 
-    return (
-      title.includes(searchText) ||
-      category.includes(searchText) ||
-      brand.includes(searchText) ||
-      description.includes(searchText)
-    );
-  });
+  return (
+    title.includes(searchText) ||
+    category.includes(searchText) ||
+    brand.includes(searchText) ||
+    description.includes(searchText)
+  );
+});
 
   if (matchedProducts.length > 0) {
     return {
